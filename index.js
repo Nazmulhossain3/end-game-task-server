@@ -27,10 +27,12 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
   
   const collageCollection = client.db('endGameDb').collection('collage')
   const allCollageCollection = client.db('endGameDb').collection('allCollage')
+  const AdmissionCollageCollection = client.db('endGameDb').collection('Admission')
+  const myCollageCollection = client.db('endGameDb').collection('myCollage')
   
 //  home collage api here 
  
@@ -59,7 +61,44 @@ app.get('/allCollage', async(req,res)=> {
      
 })
 
+app.get('/allCollage/:id', async(req,res)=> {
 
+const id = req.params.id 
+const query = {_id : new ObjectId(id)}
+const result = await allCollageCollection.findOne(query)
+res.send(result)
+
+})
+
+// admission collage name api
+
+app.get('/admission', async(req,res)=> {
+
+    const result = await AdmissionCollageCollection.find().toArray()
+    res.send(result)
+
+
+
+})
+
+
+app.post('/myCollage', async(req,res)=> {
+
+    const candidate = req.body 
+    const result = await myCollageCollection.insertOne(candidate)
+    res.send(result)
+
+})
+
+app.get('/myCollage/:email', async(req,res)=> {
+
+const email = req.params.email 
+const filter = { email }
+const result = await myCollageCollection.find(filter).toArray()
+res.send(result)
+
+
+})
 
   
   
@@ -67,8 +106,8 @@ app.get('/allCollage', async(req,res)=> {
   
   
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    // await client.db("admin").command({ ping: 1 });
+    // console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
